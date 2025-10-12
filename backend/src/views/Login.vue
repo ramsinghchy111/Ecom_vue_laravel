@@ -1,12 +1,37 @@
 <script setup lang="ts">
+import { ref } from 'process';
 import GuestLayout from '../components/GuestLayout.vue';
+import { Ref } from 'vue';
+import store from '../store';
+import router from '../router';
 
+let loading = ref(false);
+let errorMsg = ref("");
+
+
+const user = {
+  email: '',
+  password: ''
+}
+
+function login(){
+  loading.value = true;
+  store.dispatch('login', user)
+  .then(() => {
+    loading.value = false;
+    router.push({name:'dashboard'})
+  })
+  .catch(({response}) => {
+    loading.value = false;
+    errorMsg.value = response.data.message;
+  })
+}
 </script>
 
 <template>
  <GuestLayout title="sign in to your account">
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-      <form class="space-y-6" action="#" method="POST" novalidate>
+      <form class="space-y-6" action="#" method="POST" @submit.prevent="login" novalidate>
         <div>
           <label for="email" class="block text-sm font-medium text-gray-100 ">Email address</label>
           <div class="mt-2">
@@ -17,7 +42,8 @@ import GuestLayout from '../components/GuestLayout.vue';
               autocomplete="email"
               required
               class="block w-full rounded-md bg-white/5 px-3 py-2 text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+              v-model="user.email"
+              />
           </div>
         </div>
 
@@ -31,7 +57,8 @@ import GuestLayout from '../components/GuestLayout.vue';
               autocomplete="current-password"
               required
               class="block w-full rounded-md bg-white/5 px-3 py-2 text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+              v-model="user.password"
+              />
           </div>
 
           <!-- moved below input and right-aligned -->
