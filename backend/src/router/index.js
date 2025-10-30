@@ -66,13 +66,31 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach(async(to,from,next) => {
-    if(to.meta.requiresAuth && !store.state.user.token ){
-        next({name: 'login'})
-    }else if (to.meta.requiresGuest && store.state.user.token){
-        next({name:'Dashboard'})
-    }else{
-        next();
-    }
-})
+// router.beforeEach(async(to,from,next) => {
+//     if(to.meta.requiresAuth && !store.state.user.token ){
+//         next({name: 'login'})
+//     }else if (to.meta.requiresGuest && store.state.user.token){
+//         next({name:'Dashboard'})
+//     }else{
+//         next();
+//     }
+// })
+
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta && record.meta.requiresAuth);
+  const requiresGuest = to.matched.some(record => record.meta && record.meta.requiresGuest);
+
+  // Prefer store token, but fallback to localStorage if store hasn't hydrated yet
+  const token = store.state?.user?.token || localStorage.getItem('token');
+
+  if (requiresAuth && !token) {
+    // preserve where the user wanted to go
+    next({ name: 'login', query: { redirect: to.fullPath } });
+  } else if (requiresGuest && token) {
+    next({ name: 'Dashboard' });
+  } else {
+    next();
+  }
+});
+
 export default router;

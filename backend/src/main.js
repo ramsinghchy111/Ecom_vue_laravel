@@ -6,5 +6,6 @@ import './style.css'
 
 const app = createApp(App)
 app.use(store) 
-app.use(router)  // <-- register Vuex store
+app.use(router) 
+store.dispatch('getUser')
 app.mount('#app')

@@ -25,7 +25,7 @@
               aria-label="Open user menu"
             >
               <img src="https://randomuser.me/api/portraits/men/1.jpg" class="w-10 h-10 rounded-full object-cover" alt="User avatar" />
-            <small class="text-gray-500 font-semibold">John Smith</small>
+            <small class="text-gray-500 font-semibold">{{currentUser.email}}</small>
             </MenuButton>
           </div>
 
@@ -58,6 +58,7 @@
             </MenuItem>
             <MenuItem v-slot="{ active }">
               <button
+              @click="logout"
                 :class="[
                   active ? 'bg-violet-500 text-white' : 'text-gray-900',
                   'group flex w-full items-center rounded-md px-2 py-2 text-sm',
@@ -81,4 +82,15 @@
 
 <script setup lang="ts">
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
+import store from '../store';
+import router from '../router';
+import { computed } from 'vue';
+
+function logout(){
+  store.dispatch('logout')
+  .then(() => {
+    router.push({name:'login'})
+  })
+}
+const currentUser = computed(() => store.state.user.data)
 </script>

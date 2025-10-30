@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'process';
 import GuestLayout from '../components/GuestLayout.vue';
-import { Ref } from 'vue';
+import { ref } from 'vue';
 import store from '../store';
 import router from '../router';
 
@@ -19,7 +18,7 @@ function login(){
   store.dispatch('login', user)
   .then(() => {
     loading.value = false;
-    router.push({name:'dashboard'})
+    router.push({name:'Dashboard'})
   })
   .catch(({response}) => {
     loading.value = false;
@@ -32,6 +31,15 @@ function login(){
  <GuestLayout title="sign in to your account">
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form class="space-y-6" action="#" method="POST" @submit.prevent="login" novalidate>
+        <div v-if="errorMsg" class="flex items-center justify-center py-3 px-5 bg-red-500 text-white rounded">
+          {{ errorMsg }}
+          <span @click="errorMsg = ''" class="w-8 h-8 items-center justify-between rounded-full transition-colors cursor-pointer hover:bg-black/20">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+
+          </span>
+        </div>
         <div>
           <label for="email" class="block text-sm font-medium text-gray-100 ">Email address</label>
           <div class="mt-2">

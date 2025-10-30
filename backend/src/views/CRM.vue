@@ -1,9 +1,16 @@
 <template>
-   <h1>das</h1>
+  <div>
+    <KanbanBoard />
+  </div>
 </template>
 
 <script lang="ts">
-export default{
-    name:"CRM"
-}
+import { defineComponent } from 'vue'
+import KanbanBoard from "../components/KanbanBoard.vue";
+
+export default defineComponent({
+  name: 'CRM',
+  components: {KanbanBoard}
+})
 </script>
+
