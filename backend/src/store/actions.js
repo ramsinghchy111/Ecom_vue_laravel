@@ -1,4 +1,4 @@
-import axiosClient from "../axios";
+import axiosClient from "../axiosClient";
 
 export function getUser({commit},data){
     return axiosClient.get('/user',data)
