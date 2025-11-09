@@ -1,16 +1,17 @@
 <template>
   <div>
-    <TaskBoard />
+    <KanbanBoard />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import TaskBoard from "../components/TaskBoard.vue";
+import KanbanBoard from '../components/KanbanBoard.vue';
 
 export default defineComponent({
   name: 'CRM',
-  components: {TaskBoard}
+  components: {KanbanBoard}
 })
 </script>
 

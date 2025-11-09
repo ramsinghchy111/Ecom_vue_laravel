@@ -1,12 +1,15 @@
 <template>
   <div class="kanban-board">
+    <!-- Loop over all columns -->
     <KanbanColumn
       v-for="col in columns"
       :key="col.id"
       :column="col"
       @card-moved="handleCardMoved"
-      @open-add-lead="openAddModal"
+      @open-add-card="openAddModal"
     />
+
+    <!-- Modal to add a new card -->
     <AddLeadModal
       :visible="modalVisible"
       :columnId="modalColumnId"
@@ -22,17 +25,30 @@ import { useStore } from 'vuex'
 import KanbanColumn from './KanbanColumn.vue'
 import AddLeadModal from './AddLeadModal.vue'
 
+// Vuex store
 const store = useStore()
-const columns = computed(() => store.getters['kanban/getColumns'])
 
+// --- STATE --- //
 const modalVisible = ref(false)
-const modalColumnId = ref(null)
+const modalColumnId = ref<number | null>(null)
 
-onMounted(() => {
-  store.dispatch('kanban/fetchBoard').catch(e => console.error(e))
+// --- COMPUTED --- //
+// safely fetch normalized columns array from store
+const columns = computed(() => store.getters['kanban/columnsList'])
+const loading = computed(() => store.state.kanban.loading)
+const error = computed(() => store.state.kanban.error)
+
+// --- LIFECYCLE --- //
+onMounted(async () => {
+  try {
+    await store.dispatch('kanban/fetchColumns')
+  } catch (e) {
+    console.error('Error loading Kanban board:', e)
+  }
 })
 
-function openAddModal(columnId) {
+// --- METHODS --- //
+function openAddModal(columnId: number) {
   modalColumnId.value = columnId
   modalVisible.value = true
 }
@@ -42,24 +58,45 @@ function closeAddModal() {
   modalColumnId.value = null
 }
 
-async function onCardSaved(created) {
-  // after server returns created card, ensure store is up-to-date
-  // createCard action already commits addCard, so nothing needed here.
-  // but we can refresh if needed:
-  // await store.dispatch('kanban/fetchBoard')
-  console.log('Card saved', created)
+async function onCardSaved(createdCard: any) {
+  // Card creation is already handled by store’s createCard action
+  console.log('✅ Card saved successfully:', createdCard)
 }
 
-async function handleCardMoved(payload) {
-  // payload expected: { cardId, fromColumnId, toColumnId, toIndex }
+async function handleCardMoved(payload: { cardId: number, fromColumnId: number, toColumnId: number, toIndex: number }) {
   try {
-    await store.dispatch('kanban/persistCardMove', payload)
+    // Update store immediately (optimistic update)
+    await store.dispatch('kanban/updateCard', {
+      id: payload.cardId,
+      column_id: payload.toColumnId,
+      position: payload.toIndex
+    })
   } catch (e) {
-    console.error('Failed to persist card move', e)
+    console.error('❌ Failed to persist card move:', e)
   }
 }
 </script>
 
 <style scoped>
-.kanban-board { display:flex; gap:12px; align-items:flex-start; padding:12px; overflow:auto; }
+.kanban-board {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px;
+  overflow-x: auto;
+  min-height: 80vh;
+  background: #f8f9fa;
+}
+
+/* Optional loading/error styles */
+.loading {
+  text-align: center;
+  font-weight: 500;
+  color: #888;
+}
+
+.error {
+  color: #c00;
+  text-align: center;
+}
 </style>

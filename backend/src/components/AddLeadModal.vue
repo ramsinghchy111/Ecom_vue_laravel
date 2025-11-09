@@ -126,7 +126,7 @@ import { useStore } from 'vuex'
 
 const props = defineProps({
   visible: { type: Boolean, required: true },
-  columnId: { type: [String, Number], required: true },
+  columnId: { type: [String, Number], required: false },
   assignees: { type: Array, required: false }
 })
 const emits = defineEmits(['close','saved'])

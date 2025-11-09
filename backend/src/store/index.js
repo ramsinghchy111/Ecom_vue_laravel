@@ -3,7 +3,8 @@ import { createStore } from "vuex";
 import * as actions from './actions';
 import * as mutations from './mutations';
 
-import tasks from "./tasks";
+import tasks from "./kanban";
+import kanban from "./kanban";
 const store = createStore(  {
     state: {
         user:{
@@ -16,7 +17,7 @@ const store = createStore(  {
     mutations,
 
       modules: {
-        tasks
+        kanban,
         }
 });
 
